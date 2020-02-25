@@ -126,9 +126,11 @@ class SSB {
 
       opts = opts || {}
       opts.reverse = opts.reverse || true
+      opts.reverse = opts.keys || true
+      console.warn('logStream opts:', opts)
 
       pull(
-        sbot.createFeedStream(opts),
+        sbot.createLogStream(opts),
         pull.filter(msg => msg && msg.value && msg.value.content),
         this.filterTypes(),
         this.filterWithUserFilters(),
@@ -150,19 +152,7 @@ class SSB {
         if (err) return reject(err)
         var rootMsg = { key: id, value: value }
         pull(
-          sbot.backlinks && sbot.backlinks.read ? sbot.backlinks.read({
-            query: [
-              {
-                $filter: {
-                  dest: id
-                }
-              }
-            ],
-            reverse: true
-          }) : pull(
-            sbot.links({ dest: id, values: true, rel: 'root' }),
-            pull.unique('key')
-          ),
+          sbot.tangles({root: id}),
           this.filterTypes(),
           this.filterWithUserFilters(),
           this.filterLimit(),
@@ -340,6 +330,7 @@ class SSB {
       let opts = {
         id: feedid,
         reverse: true,
+        keys:true,
         limit: getPref("limit", 10)
       }
 
@@ -349,7 +340,7 @@ class SSB {
       }
 
       pull(
-        sbot.createUserStream(opts),
+        sbot.createHistoryStream(opts),
         pull.collect(function (err, data) {
           if (err) {
             reject(err)

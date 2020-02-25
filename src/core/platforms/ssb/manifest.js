@@ -3,13 +3,9 @@ var manifest = {
   "address": "sync",
   "manifest": "sync",
   "get": "async",
-  "createFeedStream": "source",
   "createLogStream": "source",
   "messagesByType": "source",
   "createHistoryStream": "source",
-  "createUserStream": "source",
-  "links": "source",
-  "relatedMessages": "async",
   "add": "async",
   "status": "async",
   "publish": "async",
@@ -18,7 +14,6 @@ var manifest = {
   "latest": "source",
   "latestSequence": "async",
   "whoami": "sync",
-  "usage": "sync",
   "gossip": {
     "peers": "sync",
     "add": "sync",
@@ -27,22 +22,10 @@ var manifest = {
     "changes": "source",
     "reconnect": "sync"
   },
-  "friends": {
-    "all": "async",
-    "hops": "async",
-    "createFriendStream": "source",
-    "get": "sync"
-  },
-  "replicate": {
-    "changes": "source"
-  },
   "invite": {
     "create": "async",
     "accept": "async",
     "use": "async"
-  },
-  "block": {
-    "isBlocked": "sync"
   },
   "names": {
     "get": "async",
@@ -68,22 +51,7 @@ var manifest = {
     "changes": "source",
     "createWants": "source"
   },
-  "links2": {
-    "read": "source",
-    "dump": "source"
-  },
-  "backlinks": {
-    "read": "source",
-    "dump": "source"
-  },
-  "query": {
-    "read": "source",
-    "dump": "source"
-  },
   "ws": {},
-  "search": {
-    "query": "source"
-  }
 }
 
 module.exports = manifest

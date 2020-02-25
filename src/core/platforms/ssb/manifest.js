@@ -11,7 +11,6 @@ var manifest = {
   "publish": "async",
   "getAddress": "sync",
   "getLatest": "async",
-  "latest": "source",
   "latestSequence": "async",
   "whoami": "sync",
   "gossip": {
@@ -52,6 +51,7 @@ var manifest = {
     "createWants": "source"
   },
   "ws": {},
+  "tangles": "source",
 }
 
 module.exports = manifest

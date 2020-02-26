@@ -84,6 +84,7 @@ class SSB {
   }
 
   filterLimit() {
+    console.warn('filterLimit(): push me up into the actual query')
     let limit = getPref("limit", 10)
     return pull.take(limit)
   }
@@ -111,6 +112,11 @@ class SSB {
     }
 
     return pull.filter(msg => {
+      if (!msg.value.content) {
+        console.error('typeFilter debug:')
+        console.warn(msg)
+        return false
+      }
       let type = msg.value.content.type
 
       if (typeof type == "string" && knownMessageTypes[type]) {
@@ -126,13 +132,15 @@ class SSB {
 
       opts = opts || {}
       opts.reverse = opts.reverse || true
+      opts.keys = opts.keys || true
+      opts.limit = getPref("limit", 10)
+      console.warn('logStream opts:', opts)
 
       pull(
-        sbot.createFeedStream(opts),
+        sbot.createLogStream(opts),
         pull.filter(msg => msg && msg.value && msg.value.content),
         this.filterTypes(),
         this.filterWithUserFilters(),
-        this.filterLimit(),
         pull.collect((err, msgs) => {
           if (err) {
             reject(err)
@@ -150,22 +158,9 @@ class SSB {
         if (err) return reject(err)
         var rootMsg = { key: id, value: value }
         pull(
-          sbot.backlinks && sbot.backlinks.read ? sbot.backlinks.read({
-            query: [
-              {
-                $filter: {
-                  dest: id
-                }
-              }
-            ],
-            reverse: true
-          }) : pull(
-            sbot.links({ dest: id, values: true, rel: 'root' }),
-            pull.unique('key')
-          ),
+          sbot.tangles({root: id, keys: true, limit: getPref("limit", 10)}),
           this.filterTypes(),
           this.filterWithUserFilters(),
-          this.filterLimit(),
           pull.collect((err, msgs) => {
             if (err) reject(err)
             resolve(sort([rootMsg].concat(msgs)))
@@ -340,6 +335,7 @@ class SSB {
       let opts = {
         id: feedid,
         reverse: true,
+        keys:true,
         limit: getPref("limit", 10)
       }
 
@@ -349,7 +345,7 @@ class SSB {
       }
 
       pull(
-        sbot.createUserStream(opts),
+        sbot.createHistoryStream(opts),
         pull.collect(function (err, data) {
           if (err) {
             reject(err)
